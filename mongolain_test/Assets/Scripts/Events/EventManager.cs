@@ -40,7 +40,10 @@ public class EventManager : MonoBehaviour
 
 public enum GameEvent
 {
-    ExampleEvent
+    ExampleEvent,
+    PlayerDeath,
+    PlayerRespawn,
+    LevelComplete,
 }
 
 
