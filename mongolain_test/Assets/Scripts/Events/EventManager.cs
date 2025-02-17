@@ -44,6 +44,8 @@ public enum GameEvent
     PlayerDeath,
     PlayerRespawn,
     LevelComplete,
+    Celebration,
+    Quest,
 }
 
 
