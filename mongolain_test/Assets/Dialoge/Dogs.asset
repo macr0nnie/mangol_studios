@@ -10,16 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29c1096a10e1f58478c6484b73805506, type: 3}
-  m_Name: Test
+  m_Name: Dogs
   m_EditorClassIdentifier: 
-  dialogueText: 'What are you going to do next
-
-'
+  dialogueText: 
   voiceLine: {fileID: 0}
   displayType: 0
   image: {fileID: 0}
-  choices:
-  - choiceText: I like cats
-    nextDialogue: {fileID: 11400000, guid: ab0ac8b15fca32b4fb448271dd486055, type: 2}
-  - choiceText: I like dogs
-    nextDialogue: {fileID: 11400000, guid: ab0ac8b15fca32b4fb448271dd486055, type: 2}
+  choices: []
