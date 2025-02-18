@@ -7,9 +7,19 @@ using TMPro;
 public class DialogueUIController : MonoBehaviour
 {
     [Header("Dialogue Panel Components")]
+
+    public GameObject cutscene_panel;          // The panel containing the cutscene
+    //cutscene text
+    public TMP_Text cutsceneText;
+   
+    public GameObject bubbles_panel;
+    public TMP_Text bubblesText;
+    public Image dialogueImage;                // Image element for cutscene display
+    
+
     public RectTransform dialoguePanel;      // The panel containing the dialogue
     public TextMeshProUGUI dialogueText;       // Text element for dialogue text
-    public Image dialogueImage;                // Image element for cutscene display
+                 // Image element for cutscene display
 
     [Header("Choice Panel Components")]
     public GameObject choicePanel;             // Panel that contains the choice buttons
@@ -21,22 +31,22 @@ public class DialogueUIController : MonoBehaviour
     public void DisplayDialogueLine(DialogueLine line)
     {
         currentDialogueLine = line;
-
         // Set up the panel based on the display type
         if (line.displayType == DialogueDisplayType.Cutscene)
         {
-            // For cutscenes, use a larger panel and show the image
-            //use the cutscene panel
-            dialoguePanel.sizeDelta = new Vector2(600, 300);
-            dialogueImage.gameObject.SetActive(true);
-            dialogueImage.sprite = line.image;
+            //enable the cutscene panel
+            cutscene_panel.SetActive(true);
+           //set the cutscene image
+           //need to be able to change the image depending on the dialoge line? in future
+            dialogueImage.sprite = line.image; 
         }
         else
         {
+            bubbles_panel.SetActive(true);
+            
             // For standard dialogue, use a smaller panel without the image
             //use the pop up panel
-            dialoguePanel.sizeDelta = new Vector2(400, 150);
-            dialogueImage.gameObject.SetActive(false);
+         
         }
 
         dialogueText.text = line.dialogueText;
@@ -56,10 +66,7 @@ public class DialogueUIController : MonoBehaviour
         {
             HideChoices();
         }
-    }
-
-
-    
+    }    
     private void DisplayChoices(List<DialogueChoice> choices)
     {
         choicePanel.SetActive(true);
@@ -85,9 +92,6 @@ public class DialogueUIController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Hides the choices UI.
-    /// </summary>
     private void HideChoices()
     {
         choicePanel.SetActive(false);
