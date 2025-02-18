@@ -32,4 +32,12 @@ public class Quest : MonoBehaviour
     {
         EventManager.Trigger<string>(GameEvent.Quest, quests[currentQuestIndex]);
     }
+
+    //complete the quest when the requirements are met then set a new quest
+    public void CompleteQuest()
+    {
+        Debug.Log("Quest completed: " + quests[currentQuestIndex]);
+        currentQuestIndex = (currentQuestIndex + 1) % quests.Count;
+        TriggerCurrentQuest();
+    }
 }

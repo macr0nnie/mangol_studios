@@ -14,9 +14,7 @@ public class DialogueUIController : MonoBehaviour
     [Header("Choice Panel Components")]
     public GameObject choicePanel;             // Panel that contains the choice buttons
     public List<Button> choiceButtons;         // Pre-assigned buttons to display choices
-
     private DialogueLine currentDialogueLine;  // The current dialogue line being shown
-
     /// <summary>
     /// Displays a dialogue line on the UI.
     /// </summary>
@@ -28,6 +26,7 @@ public class DialogueUIController : MonoBehaviour
         if (line.displayType == DialogueDisplayType.Cutscene)
         {
             // For cutscenes, use a larger panel and show the image
+            //use the cutscene panel
             dialoguePanel.sizeDelta = new Vector2(600, 300);
             dialogueImage.gameObject.SetActive(true);
             dialogueImage.sprite = line.image;
@@ -35,6 +34,7 @@ public class DialogueUIController : MonoBehaviour
         else
         {
             // For standard dialogue, use a smaller panel without the image
+            //use the pop up panel
             dialoguePanel.sizeDelta = new Vector2(400, 150);
             dialogueImage.gameObject.SetActive(false);
         }
@@ -58,9 +58,8 @@ public class DialogueUIController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Displays available dialogue choices.
-    /// </summary>
+
+    
     private void DisplayChoices(List<DialogueChoice> choices)
     {
         choicePanel.SetActive(true);
