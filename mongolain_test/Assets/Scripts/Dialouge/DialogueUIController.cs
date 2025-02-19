@@ -28,6 +28,12 @@ public class DialogueUIController : MonoBehaviour
     /// <summary>
     /// Displays a dialogue line on the UI.
     /// </summary>
+    public void Start()
+    {
+        cutscene_panel.SetActive(false);
+        bubbles_panel.SetActive(false);
+        choicePanel.SetActive(false);
+    }
     public void DisplayDialogueLine(DialogueLine line)
     {
         currentDialogueLine = line;
@@ -35,25 +41,29 @@ public class DialogueUIController : MonoBehaviour
         if (line.displayType == DialogueDisplayType.Cutscene)
         {
             //enable the cutscene panel
+            //set the cutscene image
+            //need to be able to change the image depending on the dialoge line? in future
+            bubbles_panel.SetActive(false);
             cutscene_panel.SetActive(true);
-           //set the cutscene image
-           //need to be able to change the image depending on the dialoge line? in future
+            cutsceneText.text = line.dialogueText;    
             dialogueImage.sprite = line.image; 
         }
         else
         {
+            //enable the bubbles panel
+            cutscene_panel.SetActive(false);
             bubbles_panel.SetActive(true);
-            
+            bubblesText.text = line.dialogueText;       
             // For standard dialogue, use a smaller panel without the image
             //use the pop up panel
          
         }
-
-        dialogueText.text = line.dialogueText;
-
+       // dialogueText.text = line.dialogueText;
         // Play voice clip if available
         if (line.voiceLine != null)
         {
+            //need to check if voicelines are playing
+            //end the voiceline if the dialogue is skipped
             AudioSource.PlayClipAtPoint(line.voiceLine, Camera.main.transform.position);
         }
 
@@ -101,7 +111,6 @@ public class DialogueUIController : MonoBehaviour
             btn.onClick.RemoveAllListeners();
         }
     }
-
     /// <summary>
     /// Called when a dialogue choice is selected.
     /// </summary>

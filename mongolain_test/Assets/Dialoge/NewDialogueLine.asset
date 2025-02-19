@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29c1096a10e1f58478c6484b73805506, type: 3}
-  m_Name: Dogs
+  m_Name: NewDialogueLine
   m_EditorClassIdentifier: 
   dialogueText: 
   voiceLine: {fileID: 0}
