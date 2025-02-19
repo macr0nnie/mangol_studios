@@ -18,7 +18,7 @@ MonoBehaviour:
   displayType: 1
   image: {fileID: 3498214614226137443, guid: 890882db988230347bebd0e0c79972ea, type: 3}
   choices:
-  - choiceText: Are you cat or dog?
-    nextDialogue: {fileID: 11400000, guid: ab0ac8b15fca32b4fb448271dd486055, type: 2}
-  - choiceText: Are you cat or dog?
-    nextDialogue: {fileID: 11400000, guid: 1da04fae614d9074c8c726130d23d62e, type: 2}
+  - choiceText: cat
+    nextDialogue: {fileID: 11400000, guid: 6149792d610ac07439a443975c1387cb, type: 2}
+  - choiceText: dog?
+    nextDialogue: {fileID: 11400000, guid: 9032e1a65a95a5448ae43c1db79037c9, type: 2}
