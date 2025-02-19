@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29c1096a10e1f58478c6484b73805506, type: 3}
   m_Name: Choice_Intro
   m_EditorClassIdentifier: 
-  dialogueText: "Are you happy to be here? What is your favoirte, pet. \n\n"
+  dialogueText: "But first are you happy to be here? What is your favoirte, pet.
+    \n\n"
   voiceLine: {fileID: 0}
   displayType: 1
   image: {fileID: 3498214614226137443, guid: 890882db988230347bebd0e0c79972ea, type: 3}
