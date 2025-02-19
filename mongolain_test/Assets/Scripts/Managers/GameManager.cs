@@ -22,18 +22,25 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-   
-      
-   
     void Start()
     {
+        //apply the game settings
         
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-       
+        //pause the game
     }
+    //load a new map area// or reference a map class
+    
+    private void ApplyGameSettings()
+    {
+        // Apply game settings
+        //AudioManager.Instance.SetVolume(gameSettings.masterVolume);
+        //QualitySettings.SetQualityLevel(gameSettings.graphicsQuality);
+    }
+
+
 }
