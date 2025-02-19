@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
-
+using UnityEngine.Events;
 
 public class EventManager : MonoBehaviour
 {
@@ -37,3 +38,26 @@ public class EventManager : MonoBehaviour
     }
 }
 
+public enum GameEvent
+{
+    ExampleEvent,
+    PlayerDeath,
+    PlayerRespawn,
+    LevelComplete,
+    Celebration,
+    Quest,
+    QuestCompleted
+
+}
+
+
+[CreateAssetMenu(fileName = "New Game Event", menuName = "Game Events/Event")]
+public class GameEventSO : ScriptableObject
+{
+    public UnityEvent onEventRaised;
+
+    public void RaiseEvent()
+    {
+        onEventRaised?.Invoke();
+    }
+}
