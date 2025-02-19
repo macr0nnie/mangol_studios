@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29c1096a10e1f58478c6484b73805506, type: 3}
   m_Name: CatPerson
   m_EditorClassIdentifier: 
-  dialogueText: 
+  dialogueText: good choice. very witchy very aesthicccc
   voiceLine: {fileID: 0}
   displayType: 0
   image: {fileID: 0}

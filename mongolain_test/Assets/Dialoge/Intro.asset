@@ -16,6 +16,6 @@ MonoBehaviour:
 
 '
   voiceLine: {fileID: 0}
-  displayType: 0
-  image: {fileID: 3498214614226137443, guid: 890882db988230347bebd0e0c79972ea, type: 3}
+  displayType: 1
+  image: {fileID: 5056263501699233215, guid: 5cee80000a348664ab5596181a76928d, type: 3}
   choices: []
