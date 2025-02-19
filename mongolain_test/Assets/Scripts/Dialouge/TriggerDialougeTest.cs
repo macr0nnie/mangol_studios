@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TriggerDialougeTest : MonoBehaviour
+public class TriggerDialogueTest : MonoBehaviour
 {
     public DialogueUIController dialogueUIController; // Reference to the DialogueUIController
     public DialogueLine[] dialogueLines; // Reference to the dialogue lines to display
@@ -9,19 +9,28 @@ public class TriggerDialougeTest : MonoBehaviour
 
     void Update()
     {
-        //just to test the dialogue system
+        // Just to test the dialogue system
         if (Input.GetKeyDown(KeyCode.Space)) // Check if the space key is pressed
         {
             TriggerDialogue();
         }
-        //in the future this will be triggered by the game events 
+        // In the future, this will be triggered by the game events 
     }
+
     private void TriggerDialogue()
     {
         if (dialogueUIController != null && dialogueLines != null && dialogueLines.Length > 0)
         {
-            dialogueUIController.DisplayDialogueLine(dialogueLines[currentDialogueIndex]);
-            currentDialogueIndex = (currentDialogueIndex + 1) % dialogueLines.Length;
+            if (currentDialogueIndex < dialogueLines.Length)
+            {
+                dialogueUIController.DisplayDialogueLine(dialogueLines[currentDialogueIndex]);
+                currentDialogueIndex++;
+            }
+            else
+            {
+                Debug.Log("Dialogue has finished.");
+                // Optionally, trigger an event or perform another action here
+            }
         }
     }
 }
