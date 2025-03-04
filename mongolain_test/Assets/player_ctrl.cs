@@ -15,7 +15,12 @@ public class player_ctrl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        process_input(); 
+        processInput(); 
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            checkInteraction(); 
+        }
 
     }
 
@@ -26,7 +31,7 @@ public class player_ctrl : MonoBehaviour
     }
 
     // method for player input
-    void process_input()
+    void processInput()
     {
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
@@ -40,4 +45,6 @@ public class player_ctrl : MonoBehaviour
     {
         rb.linearVelocity = new Vector2(moveDirection.x * move_speed, moveDirection.y * move_speed); 
     }
+
+
 }
