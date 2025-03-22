@@ -19,7 +19,7 @@ public class player_ctrl : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            checkInteraction(); 
+            //checkInteraction(); 
         }
 
     }
