@@ -137,4 +137,8 @@ public class PlayerController : MonoBehaviour
     // Public accessors for animation/other systems
     public Vector3 GetMovementVelocity() => currentVelocity;
     public bool IsDashing() => isDashing;
+
+    //depends on us if we need it
+    //jump?
+    //swim?
 }
