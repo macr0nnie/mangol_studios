@@ -74,20 +74,6 @@ public class PlayerController : MonoBehaviour
 
         // Move the character
         controller.Move(currentVelocity * Time.deltaTime);
-
-        // Rotate to face movement direction
-        if (inputDirection.magnitude > 0.1f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(
-                new Vector3(inputDirection.x, 0, inputDirection.y)
-            );
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                rotationSpeed * Time.deltaTime
-            );
-        }
-
         UpdateAnimations();
     }
 
