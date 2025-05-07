@@ -3,7 +3,8 @@ using UnityEngine;
 public enum DialogueDisplayType
 {
     Standard,   // Regular text bubble
-    Cutscene    // Larger panel with an image
+    Cutscene,    // Larger panel with an image
+    SpeachBubble
 }
 
 [System.Serializable]

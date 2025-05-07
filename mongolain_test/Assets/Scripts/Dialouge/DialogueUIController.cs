@@ -4,17 +4,24 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+//to-do 
+//refactor the code to support three panels
 public class DialogueUIController : MonoBehaviour
 {
     [Header("Dialogue Panel Components")]
 
-    public GameObject cutscene_panel;          // The panel containing the cutscene
-    //cutscene text
+    //game cutscne style panels
+    public GameObject cutscene_panel;//full cutscene
+    public GameObject top_screen_text_panel;
+     public GameObject bubbles_panel;
+
+     //text references for each panel
     public TMP_Text cutsceneText;
-   
-    public GameObject bubbles_panel;
     public TMP_Text bubblesText;
-    public Image dialogueImage;                // Image element for cutscene display
+    public TMP_Text top_screen_text; //text for the top screen panel
+    //images
+    public Image dialouge_speaker_image;
+    public Image full_screen_Image;                // Image element for cutscene display
     
 
     public RectTransform dialoguePanel;      // The panel containing the dialogue
@@ -33,6 +40,7 @@ public class DialogueUIController : MonoBehaviour
         cutscene_panel.SetActive(false);
         bubbles_panel.SetActive(false);
         choicePanel.SetActive(false);
+        top_screen_text_panel.SetActive(false);
     }
     public void DisplayDialogueLine(DialogueLine line)
     {

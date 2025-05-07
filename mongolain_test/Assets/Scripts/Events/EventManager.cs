@@ -47,7 +47,6 @@ public enum GameEvent
     Celebration,
     Quest,
     QuestCompleted
-
 }
 
 
