@@ -5,241 +5,251 @@ using UnityEngine.Events;
 
 public class PotionCreationPuzzle : PuzzleBase
 {
-    //refactor this to use the draggable item components to make it have less code
-    [System.Serializable]
-    public class Ingredient
-    {
-        public GameObject ingredientObject;
-        public string ingredientId;
-    }
 
-    [System.Serializable]
-    public class PotionRecipe
-    {
-        public string potionName;
-        public List<string> requiredIngredients;
-        public GameObject potionPrefab;
-    }
+    [SerializeField] private IngredientRepository ingredientRepository;
+    [SerializeField] private PuzzleRecipieValidator recipeValidator;
+    [SerializeField] private PuzzleDropZone cauldronZone;
+    [SerializeField] private PuzzleFeedbackController feedbackController;
 
-    [Header("Ingredients")]
-    [SerializeField] private List<Ingredient> availableIngredients;
-
-    [Header("Recipes")]
-    [SerializeField] private List<PotionRecipe> validRecipes;
-    [SerializeField] private PotionRecipe targetRecipe; // The recipe the player needs to make
-
-    [Header("Cauldron")]
-    [SerializeField] private Transform cauldronTransform;
-    [SerializeField] private float cauldronRadius = 1.5f;
-    [SerializeField] private ParticleSystem brewingEffect;
-
-    [Header("Feedback")]
-    [SerializeField] private AudioClip? ingredientAddedSound;
-    [SerializeField] private AudioClip? correctPotionSound;
-    [SerializeField] private AudioClip? wrongPotionSound;
+    [SerializeField] private float brewingDelay = 1.5f;
+    [SerializeField] private GameObject brewingEffectPrefab;
 
     // Events
-    public UnityEvent<string> onIngredientAdded;
     public UnityEvent<string> onPotionCreated;
 
-    // State tracking
-    private List<string> currentIngredients = new List<string>();
-    private AudioSource audioSource;
+    private List<GameObject> activeBrewingEffects = new List<GameObject>();
 
-    protected override void Awake()
+    private void OnEnable()
     {
-        base.Awake();
-
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null && (ingredientAddedSound != null || correctPotionSound != null))
+        // Subscribe to events
+        if (cauldronZone != null)
         {
-            audioSource = gameObject.AddComponent<AudioSource>();
+            cauldronZone.onItemDropped.AddListener(OnItemDroppedInCauldron);
         }
-
-        if (brewingEffect != null)
+        
+        if (ingredientRepository != null)
         {
-            brewingEffect.Stop();
+            ingredientRepository.onIngredientsChanged.AddListener(OnIngredientsChanged);
+        }
+        
+        if (recipeValidator != null)
+        {
+            recipeValidator.onRecipeMatch.AddListener(OnRecipeMatch);
+            recipeValidator.onTargetRecipeMatch.AddListener(OnTargetRecipeMatch);
+        }
+    }
+    
+    private void OnDisable()
+    {
+        // Unsubscribe from events
+        if (cauldronZone != null)
+        {
+            cauldronZone.onItemDropped.RemoveListener(OnItemDroppedInCauldron);
+        }
+        
+        if (ingredientRepository != null)
+        {
+            ingredientRepository.onIngredientsChanged.RemoveListener(OnIngredientsChanged);
+        }
+        
+        if (recipeValidator != null)
+        {
+            recipeValidator.onRecipeMatch.RemoveListener(OnRecipeMatch);
+            recipeValidator.onTargetRecipeMatch.RemoveListener(OnTargetRecipeMatch);
         }
     }
 
     public override void StartPuzzle()
     {
         base.StartPuzzle();
-
-        currentIngredients.Clear();
-
-        // Set up all ingredients with drag behaviors
-        foreach (var ingredient in availableIngredients)
-        {
-            if (ingredient.ingredientObject != null)
-            {
-                ingredient.ingredientObject.SetActive(true);
-
-                DragDrop dragDrop = ingredient.ingredientObject.GetComponent<DragDrop>();
-                if (dragDrop == null)
-                {
-                    dragDrop = ingredient.ingredientObject.AddComponent<DragDrop>();
-                }
-
-                // Remove any existing handlers to prevent duplicates
-                dragDrop.onPieceDropped -= OnIngredientDropped;
-                dragDrop.onPieceDropped += OnIngredientDropped;
-            }
-        }
+        
+        // Reset all systems
+        ResetPuzzleState();
+        
+        // Setup ingredient draggables
+        SetupIngredients();
     }
-
-    private void OnIngredientDropped(GameObject ingredientObject, Vector3 position)
+    
+    private void SetupIngredients()
     {
-        // Check if ingredient was dropped in cauldron
-        if (cauldronTransform != null)
+        if (ingredientRepository != null)
         {
-            float distance = Vector2.Distance(
-                new Vector2(position.x, position.z),
-                new Vector2(cauldronTransform.position.x, cauldronTransform.position.z)
-            );
-
-            if (distance <= cauldronRadius)
+            // Access all ingredient objects and ensure they have draggable components
+            var ingredients = ingredientRepository.GetAllIngredientObjects();
+            
+            foreach (var ingredient in ingredients)
             {
-                // Find the ingredient ID
-                Ingredient droppedIngredient = availableIngredients.Find(i => i.ingredientObject == ingredientObject);
-
-                if (droppedIngredient != null)
+                // Get or add draggable component
+                ItemDraggable draggable = ingredient.GetComponent<ItemDraggable>();
+                if (draggable == null)
                 {
-                    // Add to current ingredients
-                    currentIngredients.Add(droppedIngredient.ingredientId);
-
-                    // Play effect
-                    if (brewingEffect != null)
-                    {
-                        brewingEffect.Play();
-                    }
-
-                    // Play sound
-                    if (audioSource != null && ingredientAddedSound != null)
-                    {
-                        audioSource.PlayOneShot(ingredientAddedSound);
-                    }
-
-                    // Trigger event
-                    onIngredientAdded?.Invoke(droppedIngredient.ingredientId);
-
-                    // Remove or hide the ingredient
-                    ingredientObject.SetActive(false);
-
-                    // Check if a potion is ready
-                    CheckPotionCreation();
+                    draggable = ingredient.AddComponent<ItemDraggable>();
                 }
-            }
-            else
-            {
-                // Return to original position
-                DragDrop dragDrop = ingredientObject.GetComponent<DragDrop>();
-                if (dragDrop != null)
-                {
-                    dragDrop.ResetPosition();
-                }
+                
+                // Reset position and make draggable
+                draggable.ResetPosition();
+                draggable.SetDraggable(true);
+                
+                // Connect drag end event
+                draggable.onDragEnd.RemoveListener(OnIngredientDragEnd); // Avoid duplicates
+                draggable.onDragEnd.AddListener(OnIngredientDragEnd);
             }
         }
     }
-
-    private void CheckPotionCreation()
+    
+    private void OnIngredientDragEnd(PuzzleItemDraggable draggable, Vector3 position)
     {
-        if (currentIngredients.Count < 2) return; // Need at least 2 ingredients
-
-        // Check if current ingredients match any recipe
-        foreach (var recipe in validRecipes)
+        // This method is actually not needed with our modular approach
+        // as the cauldron drop zone will handle the dropping logic
+        // and broadcast its own events, which we listen to.
+    }
+    
+    private void OnItemDroppedInCauldron(GameObject item)
+    {
+        if (ingredientRepository == null || item == null) return;
+        
+        // Get the ingredient ID from the GameObject
+        string ingredientId = ingredientRepository.GetIngredientIdByGameObject(item);
+        
+        if (!string.IsNullOrEmpty(ingredientId))
         {
-            bool isMatch = true;
-
-            // Check if all required ingredients are present
-            foreach (string requiredIngredient in recipe.requiredIngredients)
+            // Add the ingredient to our active ingredients
+            ingredientRepository.AddIngredient(ingredientId);
+            
+            // Play a brewing effect
+            CreateBrewingEffect(cauldronZone.transform.position);
+            
+            // Tell the draggable it was dropped in a valid zone
+            ItemDraggable draggable = item.GetComponent<ItemDraggable>();
+            if (draggable != null)
             {
-                if (!currentIngredients.Contains(requiredIngredient))
-                {
-                    isMatch = false;
-                    break;
-                }
+                draggable.SetDroppedInValidZone(true);
             }
-
-            // Check if no extra ingredients were added
-            if (isMatch && currentIngredients.Count == recipe.requiredIngredients.Count)
+            
+            // Play feedback
+            if (feedbackController != null)
             {
-                // Potion created!
-                onPotionCreated?.Invoke(recipe.potionName);
-
-                // Play correct effect
-                if (audioSource != null)
-                {
-                    if (recipe == targetRecipe)
-                    {
-                        audioSource.PlayOneShot(correctPotionSound);
-                        // Correct potion created
-                        CompletePuzzle();
-                    }
-                    else
-                    {
-                        audioSource.PlayOneShot(wrongPotionSound);
-                        // Wrong potion, reset
-                        StartCoroutine(ResetAfterDelay(2f));
-                    }
-                }
-
-                // Instantiate potion object if available
-                if (recipe.potionPrefab != null)
-                {
-                    Instantiate(recipe.potionPrefab, cauldronTransform.position + Vector3.up, Quaternion.identity);
-                }
-
-                return;
+                feedbackController.ShowActionFeedback(cauldronZone.transform.position);
             }
         }
     }
-
-    private IEnumerator ResetAfterDelay(float delay)
+    
+    private void OnIngredientsChanged(List<string> currentIngredients)
+    {
+        if (recipeValidator == null || currentIngredients.Count == 0) return;
+        
+        // Validate the current ingredients against recipes
+        recipeValidator.ValidateRecipe(currentIngredients);
+    }
+    
+    private void OnRecipeMatch(RecipeData recipe)
+    {
+        // A recipe was matched (any recipe, not necessarily the target)
+        
+        // Spawn the result object if available
+        if (recipe.resultPrefab != null && cauldronZone != null)
+        {
+            Instantiate(recipe.resultPrefab, 
+                cauldronZone.transform.position + Vector3.up, 
+                Quaternion.identity);
+        }
+        
+        // Notify listeners
+        onPotionCreated?.Invoke(recipe.recipeName);
+        
+        // Play success feedback
+        if (feedbackController != null)
+        {
+            feedbackController.ShowSuccessFeedback(cauldronZone.transform.position);
+        }
+    }
+    
+    private void OnTargetRecipeMatch(RecipeData recipe)
+    {
+        // The target recipe was matched - this completes the puzzle!
+        
+        // A slight delay before completing looks more natural
+        StartCoroutine(DelayedComplete(recipe));
+    }
+    
+    private IEnumerator DelayedComplete(RecipeData recipe)
+    {
+        yield return new WaitForSeconds(brewingDelay);
+        
+        // Play extra success feedback
+        if (feedbackController != null)
+        {
+            feedbackController.ShowSuccessFeedback(cauldronZone.transform.position);
+        }
+        
+        // Complete the puzzle
+        CompletePuzzle();
+    }
+    
+    private void CreateBrewingEffect(Vector3 position)
+    {
+        if (brewingEffectPrefab == null) return;
+        
+        GameObject effect = Instantiate(brewingEffectPrefab, position, Quaternion.identity);
+        activeBrewingEffects.Add(effect);
+        
+        // Clean up effect after delay
+        StartCoroutine(DestroyEffectAfterDelay(effect, 3f));
+    }
+    
+    private IEnumerator DestroyEffectAfterDelay(GameObject effect, float delay)
     {
         yield return new WaitForSeconds(delay);
-        Reset();
+        
+        if (effect != null)
+        {
+            activeBrewingEffects.Remove(effect);
+            Destroy(effect);
+        }
     }
-
+    
+    private void ResetPuzzleState()
+    {
+        // Reset ingredient repository
+        if (ingredientRepository != null)
+        {
+            ingredientRepository.ClearIngredients();
+            ingredientRepository.ResetIngredients();
+        }
+        
+        // Reset cauldron zone
+        if (cauldronZone != null)
+        {
+            cauldronZone.ResetZone();
+        }
+        
+        // Clean up any effects
+        foreach (var effect in activeBrewingEffects)
+        {
+            if (effect != null)
+            {
+                Destroy(effect);
+            }
+        }
+        activeBrewingEffects.Clear();
+    }
+    
     public override void Reset()
     {
         base.Reset();
-
-        // Clear current ingredients
-        currentIngredients.Clear();
-
-        // Reset all ingredients
-        foreach (var ingredient in availableIngredients)
-        {
-            if (ingredient.ingredientObject != null)
-            {
-                ingredient.ingredientObject.SetActive(true);
-
-                DragDrop dragDrop = ingredient.ingredientObject.GetComponent<DragDrop>();
-                if (dragDrop != null)
-                {
-                    dragDrop.ResetPosition();
-                }
-            }
-        }
-        // Stop effects
-        if (brewingEffect != null)
-        {
-            brewingEffect.Stop();
-        }
+        ResetPuzzleState();
     }
-    public override void OnDisable()
+    
+    protected override void OnDestroy()
     {
-        // Clean up event handlers
-        foreach (var ingredient in availableIngredients)
+        base.OnDestroy();
+        
+        // Clean up any effects
+        foreach (var effect in activeBrewingEffects)
         {
-            if (ingredient.ingredientObject != null)
+            if (effect != null)
             {
-                DragDrop dragDrop = ingredient.ingredientObject.GetComponent<DragDrop>();
-                if (dragDrop != null)
-                {
-                    dragDrop.onPieceDropped -= OnIngredientDropped;
-                }
+                Destroy(effect);
             }
         }
     }
