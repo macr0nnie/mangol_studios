@@ -1,11 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
+using UnityEngine.EventSystems; 
 
-/// <summary>
-/// Makes a GameObject draggable and handles drag-and-drop functionality
-/// for puzzle interactions.
-/// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class ItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -21,7 +17,7 @@ public class ItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     [SerializeField] private Color dragTint = new Color(1f, 1f, 1f, 0.8f);
 
     // Events with context
-    [System.Serializable] public class DragEvent : UnityEvent<PuzzleItemDraggable, Vector3> { }
+    [System.Serializable] public class DragEvent : UnityEvent<ItemDraggable, Vector3> { } //changed the name to match
     
     [Header("Events")]
     public DragEvent onDragStart;
@@ -92,7 +88,6 @@ public class ItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         // Update position
         transform.position = new Vector3(worldPos.x, worldPos.y, transform.position.z);
     }
-
     public void OnEndDrag(PointerEventData eventData)
     {
         if (!isDraggable || !isDragging) return;
@@ -120,10 +115,6 @@ public class ItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             ResetPosition();
         }
     }
-
-    /// <summary>
-    /// Reset the item to its original position
-    /// </summary>
     public void ResetPosition()
     {
         transform.position = originalPosition;
@@ -139,42 +130,22 @@ public class ItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         
         onReset?.Invoke();
     }
-
-    /// <summary>
-    /// Signal that the item was dropped in a valid zone
-    /// </summary>
     public void SetDroppedInValidZone(bool isValid)
     {
         droppedInValidZone = isValid;
     }
-
-    /// <summary>
-    /// Enable or disable dragging functionality
-    /// </summary>
     public void SetDraggable(bool canDrag)
     {
         isDraggable = canDrag;
     }
-
-    /// <summary>
-    /// Update the original position (useful when rearranging items)
-    /// </summary>
     public void UpdateOriginalPosition()
     {
         originalPosition = transform.position;
     }
-
-    /// <summary>
-    /// Get the original position of this item
-    /// </summary>
     public Vector3 GetOriginalPosition()
     {
         return originalPosition;
     }
-
-    /// <summary>
-    /// Check if the item is currently being dragged
-    /// </summary>
     public bool IsDragging()
     {
         return isDragging;

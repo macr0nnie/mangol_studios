@@ -5,30 +5,33 @@ using UnityEngine;
 public class WordPuzzle : PuzzleBase
 {
     //the text input for the secret code// word that the player has to guess;
-    private string wordToGuess;
-    private string currentGuess;
+    [SerializeField] private string wordToGuess;
+    private string currentGuess = string.Empty;
 
-    //we use override to add extra functionality to the exisitng base class
-    public override void StartPuzzle(string word)
+    public override void StartPuzzle()
     {
-        wordToGuess = word;
-        //start the puzzle
-        base.StartPuzzle();
+        base.Start(); // Changed from StartPuzzle() to match the parent
     }
+
     public override void Reset()
     {
         base.Reset();
         //reset the word to guess
         currentGuess = string.Empty;
     }
-    public override void CompletePuzzle()
+
+    // This method should check the word and then call CompletePuzzle if correct
+    public void CheckGuess(string guess)
     {
-        base.CompletePuzzle();
-        //check if the word is correct
+        currentGuess = guess;
+        
         if (currentGuess == wordToGuess)
         {
-            //call the event, this is what the interface we added was for
-            onPuzzleComplete?.Invoke(this); 
+            // Call the protected CompletePuzzle method from the base class
+            base.CompletePuzzle();
         }
     }
+
+    // Remove the CompletePuzzle override since it has incorrect logic
+    // The base.CompletePuzzle() already handles the event invocation
 }
