@@ -4,7 +4,7 @@ using UnityEngine;
 [CustomEditor(typeof(DialogueLine))]
 public class DialogueLineEditor : Editor
 {
-    // this script is used to create a custom editor in the unity menu for esme and tia
+    //this script is used to create a custom editor in the unity menu for esme and tia
     //they can directly write the lines
     SerializedProperty dialogueText;
     SerializedProperty voiceLine;
@@ -21,7 +21,6 @@ public class DialogueLineEditor : Editor
         image = serializedObject.FindProperty("image");
         choices = serializedObject.FindProperty("choices");
     }
-
     public override void OnInspectorGUI()
     {
         serializedObject.Update();

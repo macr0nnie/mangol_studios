@@ -12,21 +12,17 @@ public class DialogueUIController : MonoBehaviour
 
     //game cutscne style panels
     public GameObject cutscene_panel;//full cutscene
-    public GameObject top_screen_text_panel;
-     public GameObject bubbles_panel;
+    public GameObject top_screen_panel;
+    public GameObject bubbles_panel;
 
-     //text references for each panel
+    //text references for each panel
     public TMP_Text cutsceneText;
     public TMP_Text bubblesText;
     public TMP_Text top_screen_text; //text for the top screen panel
     //images
     public Image dialouge_speaker_image;
-    public Image full_screen_Image;                // Image element for cutscene display
-    
+    public Image full_screen_Image;          
 
-    public RectTransform dialoguePanel;      // The panel containing the dialogue
-    public TextMeshProUGUI dialogueText;       // Text element for dialogue text
-                 // Image element for cutscene display
 
     [Header("Choice Panel Components")]
     public GameObject choicePanel;             // Panel that contains the choice buttons
@@ -37,44 +33,34 @@ public class DialogueUIController : MonoBehaviour
     /// </summary>
     public void Start()
     {
+        //should i make on large dialouge panel instead?
         cutscene_panel.SetActive(false);
         bubbles_panel.SetActive(false);
         choicePanel.SetActive(false);
         top_screen_text_panel.SetActive(false);
     }
-    public void DisplayDialogueLine(DialogueLine line)
+    public void DisplayDialogueLine(DialogueLine dialogueLine)
     {
         currentDialogueLine = line;
-        // Set up the panel based on the display type
-        if (line.displayType == DialogueDisplayType.Cutscene)
+        switch (line.displayType)
         {
-            //enable the cutscene panel
-            //set the cutscene image
-            //need to be able to change the image depending on the dialoge line? in future
-            bubbles_panel.SetActive(false);
-            cutscene_panel.SetActive(true);
-            cutsceneText.text = line.dialogueText;    
-            dialogueImage.sprite = line.image; 
+            case DialogueDisplayType.Standard:
+                bubbles_panel.SetActive(true);
+                cutscene_panel.SetActive(false);
+                currentDialogueLine.standardText = line.dialogueText;
+                break;
+            case DialogueDisplayType.Cutscene:
+                // Set up the cutscene panel
+                cutscene_panel.SetActive(true);
+                bubbles_panel.SetActive(false);
+                cutsceneText.text = line.dialogueText;
+                break;
+            case DialogueDisplayType.SpeachBubble:
+                // Set up the speech bubble panel
+                top_screen_text_panel.SetActive(true);
+                bubblesText.text = line.dialogueText;
+                break;
         }
-        else
-        {
-            //enable the bubbles panel
-            cutscene_panel.SetActive(false);
-            bubbles_panel.SetActive(true);
-            bubblesText.text = line.dialogueText;       
-            // For standard dialogue, use a smaller panel without the image
-            //use the pop up panel
-         
-        }
-       // dialogueText.text = line.dialogueText;
-        // Play voice clip if available
-        if (line.voiceLine != null)
-        {
-            //need to check if voicelines are playing
-            //end the voiceline if the dialogue is skipped
-            AudioSource.PlayClipAtPoint(line.voiceLine, Camera.main.transform.position);
-        }
-
         // If there are choices, display them; otherwise hide the choice panel
         if (line.choices != null && line.choices.Count > 0)
         {
@@ -84,11 +70,10 @@ public class DialogueUIController : MonoBehaviour
         {
             HideChoices();
         }
-    }    
+    }
     private void DisplayChoices(List<DialogueChoice> choices)
     {
         choicePanel.SetActive(true);
-        
         // Loop through pre-assigned buttons and set them up with choices
         for (int i = 0; i < choiceButtons.Count; i++)
         {
@@ -109,7 +94,6 @@ public class DialogueUIController : MonoBehaviour
             }
         }
     }
-
     private void HideChoices()
     {
         choicePanel.SetActive(false);
@@ -119,17 +103,12 @@ public class DialogueUIController : MonoBehaviour
             btn.onClick.RemoveAllListeners();
         }
     }
-    /// <summary>
-    /// Called when a dialogue choice is selected.
-    /// </summary>
     private void OnChoiceSelected(DialogueChoice selectedChoice)
     {
         HideChoices();
-
         if (selectedChoice.nextDialogue != null)
         {
-            // Continue with the next dialogue line if one is assigned
-            DisplayDialogueLine(selectedChoice.nextDialogue);
+            DisplayDialogueLine(selectedChoice.nextDialogue); //go to the next assignedline for the dialouge
         }
     }
 }
