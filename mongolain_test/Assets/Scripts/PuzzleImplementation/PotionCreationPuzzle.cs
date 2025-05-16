@@ -5,7 +5,6 @@ using UnityEngine.Events;
 
 public class PotionCreationPuzzle : PuzzleBase
 {
-
     [SerializeField] private IngredientRepository ingredientRepository;
     [SerializeField] private PuzzleRecipieValidator recipeValidator;
     [SerializeField] private PuzzleDropZone cauldronZone;
