@@ -27,9 +27,9 @@ public class DialogueUIController : MonoBehaviour
     [Header("Choice Panel Components")]
     public GameObject choicePanel;             // Panel that contains the choice buttons
     public List<Button> choiceButtons;         // Pre-assigned buttons to display choices
-    private DialogueLine currentDialogueLine;  // The current dialogue line being shown
+    private DialogueLine currentDialogueLine;  // The current dialogue dialogueLine being shown
     /// <summary>
-    /// Displays a dialogue line on the UI.
+    /// Displays a dialogue dialogueLine on the UI.
     /// </summary>
     public void Start()
     {
@@ -37,34 +37,34 @@ public class DialogueUIController : MonoBehaviour
         cutscene_panel.SetActive(false);
         bubbles_panel.SetActive(false);
         choicePanel.SetActive(false);
-        top_screen_text_panel.SetActive(false);
+        top_screen_panel.SetActive(false);
     }
     public void DisplayDialogueLine(DialogueLine dialogueLine)
     {
-        currentDialogueLine = line;
-        switch (line.displayType)
+        currentDialogueLine = dialogueLine;
+        switch (dialogueLine.displayType)
         {
             case DialogueDisplayType.Standard:
                 bubbles_panel.SetActive(true);
                 cutscene_panel.SetActive(false);
-                currentDialogueLine.standardText = line.dialogueText;
+               
                 break;
             case DialogueDisplayType.Cutscene:
                 // Set up the cutscene panel
                 cutscene_panel.SetActive(true);
                 bubbles_panel.SetActive(false);
-                cutsceneText.text = line.dialogueText;
+                cutsceneText.text = dialogueLine.dialogueText;
                 break;
             case DialogueDisplayType.SpeachBubble:
                 // Set up the speech bubble panel
-                top_screen_text_panel.SetActive(true);
-                bubblesText.text = line.dialogueText;
+                top_screen_panel.SetActive(true);
+                bubblesText.text = dialogueLine.dialogueText;
                 break;
         }
         // If there are choices, display them; otherwise hide the choice panel
-        if (line.choices != null && line.choices.Count > 0)
+        if (dialogueLine.choices != null && dialogueLine.choices.Count > 0)
         {
-            DisplayChoices(line.choices);
+            DisplayChoices(dialogueLine.choices);
         }
         else
         {
