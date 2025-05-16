@@ -1,7 +1,8 @@
 using UnityEngine;
+using UnityEngine.Events;
 
-[]RequireComponent(typeof(Collider2D))]
-public class DropZone : Monobehaviour
+[RequireComponent(typeof(Collider2D))]
+public class DropZone : MonoBehaviour
 {
     public PuzzleIDs puzzleId;
     public UnityEvent<GameObject> onItemDropped;

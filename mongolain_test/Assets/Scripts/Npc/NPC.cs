@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class NPC : MonoBehaviour
 {
-    public string name;
+    public string npc_name;
     public DialogueLine[] dialogueLines;
     public float interactionDistance = 2f; // Distance within which the player can interact with the NPC
-    public DialougeLine currentDialogueLine;
+    public DialogueLine currentDialogueLine;
 
     //get the current story stage
     public void Awake()
