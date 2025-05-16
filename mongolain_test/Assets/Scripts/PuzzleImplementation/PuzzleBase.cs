@@ -1,6 +1,6 @@
 public abstract class PuzzleBase : MonoBehaviour, IPuzzle
 {
-    [SerializeField] protected string puzzleId;
+    [SerializeField] protected PuzzleIDs puzzleID;
     [SerializeField] protected bool startActive = false;
     [SerializeField] protected bool UnityEvent onPuzzleComplete;
 

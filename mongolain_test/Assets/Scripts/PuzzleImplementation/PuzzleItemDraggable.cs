@@ -9,13 +9,12 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(Collider2D))]
 public class ItemDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    [Header("Drag Settings")]
+     public PuzzleIDs puzzleId;
     [SerializeField] private bool isDraggable = true;
     [SerializeField] private Camera dragCamera;
     [SerializeField] private float dragDepth = 0f;
     [SerializeField] private bool returnToStartIfDroppedOutsideZone = true;
 
-    [Header("Visual Feedback")]
     [SerializeField] private bool scaleOnDrag = true;
     [SerializeField] private float dragScale = 1.1f;
     [SerializeField] private bool tintOnDrag = false;

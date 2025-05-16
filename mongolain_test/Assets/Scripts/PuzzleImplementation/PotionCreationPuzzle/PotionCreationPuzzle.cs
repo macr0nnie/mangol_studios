@@ -11,7 +11,6 @@ public class SimplePotionPuzzle : MonoBehaviour
         public List<string> ingredientIds;
         public GameObject resultPrefab;
     }
-
     [Header("Puzzle Setup")]
     public List<GameObject> ingredientObjects; // Assign draggable ingredient GameObjects in Inspector
     public Transform cauldronTransform;
@@ -30,30 +29,37 @@ public class SimplePotionPuzzle : MonoBehaviour
     {
         foreach (var obj in ingredientObjects)
         {
-            var drag = obj.AddComponent<SimpleDraggable>();
-            drag.onDropped += OnIngredientDropped;
+            // Add or get ItemDraggable
+            var drag = obj.GetComponent<ItemDraggable>();
+            if (drag == null)
+                drag = obj.AddComponent<ItemDraggable>();
+
+            // Subscribe to drag end event
+            drag.onDragEnd.AddListener(OnIngredientDragEnd);
         }
     }
 
-    void OnIngredientDropped(GameObject ingredientObj, Vector3 dropPos)
+    // Handler for when dragging ends
+    private void OnIngredientDragEnd(ItemDraggable draggable, Vector3 dropPos)
     {
         if (puzzleCompleted) return;
 
         float dist = Vector3.Distance(dropPos, cauldronTransform.position);
         if (dist <= cauldronRadius)
         {
-            string id = ingredientObj.name; // Use GameObject name as ID, or add a custom script for IDs
+            string id = draggable.gameObject.name; // Or use a custom ID script/component
             if (!currentIngredients.Contains(id))
                 currentIngredients.Add(id);
 
-            ingredientObj.SetActive(false); // Hide after use
+            draggable.gameObject.SetActive(false); // Hide after use
+            draggable.SetDroppedInValidZone(true);
 
             CheckRecipe();
         }
         else
         {
             // Snap back to original position
-            ingredientObj.GetComponent<SimpleDraggable>().ResetPosition();
+            draggable.ResetPosition();
         }
     }
 
@@ -94,32 +100,4 @@ public class SimplePotionPuzzle : MonoBehaviour
         }
         return temp.Count == 0;
     }
-}
-public class SimpleDraggable : MonoBehaviour
-{
-    public System.Action<GameObject, Vector3> onDropped;
-    private Vector3 startPos;
-    private bool dragging;
-
-    void Start() => startPos = transform.position;
-
-    void OnMouseDown() => dragging = true;
-
-    void OnMouseUp()
-    {
-        dragging = false;
-        onDropped?.Invoke(gameObject, transform.position);
-    }
-
-    void Update()
-    {
-        if (dragging)
-        {
-            var mouse = Input.mousePosition;
-            mouse.z = Camera.main.WorldToScreenPoint(transform.position).z;
-            transform.position = Camera.main.ScreenToWorldPoint(mouse);
-        }
-    }
-
-    public void ResetPosition() => transform.position = startPos;
 }
