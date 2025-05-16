@@ -4,8 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-//to-do 
-//refactor the code to support three panels
 public class DialogueUIController : MonoBehaviour
 {
     [Header("Dialogue Panel Components")]
@@ -23,14 +21,11 @@ public class DialogueUIController : MonoBehaviour
     public Image dialouge_speaker_image;
     public Image full_screen_Image;          
 
-
     [Header("Choice Panel Components")]
     public GameObject choicePanel;             // Panel that contains the choice buttons
     public List<Button> choiceButtons;         // Pre-assigned buttons to display choices
     private DialogueLine currentDialogueLine;  // The current dialogue dialogueLine being shown
-    /// <summary>
-    /// Displays a dialogue dialogueLine on the UI.
-    /// </summary>
+
     public void Start()
     {
         //should i make on large dialouge panel instead?
