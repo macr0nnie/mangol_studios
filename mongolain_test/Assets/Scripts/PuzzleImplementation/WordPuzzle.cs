@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WordPuzzle : PuzzleBase
 {
-    //the text input for the secret code// word that the player has to guess
+    //the text input for the secret code// word that the player has to guess;
     private string wordToGuess;
     private string currentGuess;
 

@@ -9,7 +9,6 @@ public abstract class PuzzleBase : MonoBehaviour, IPuzzle
 
     protected virtual void Awake()
     {
-        // Initialize puzzle state
         isCompleted = false;
     }
     protected virtual void Start()
