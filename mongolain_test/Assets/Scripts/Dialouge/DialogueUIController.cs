@@ -7,12 +7,10 @@ using TMPro;
 public class DialogueUIController : MonoBehaviour
 {
     [Header("Dialogue Panel Components")]
-
     //game cutscne style panels
     public GameObject cutscene_panel;//full cutscene
     public GameObject top_screen_panel;
     public GameObject bubbles_panel;
-
     //text references for each panel
     public TMP_Text cutsceneText;
     public TMP_Text bubblesText;
