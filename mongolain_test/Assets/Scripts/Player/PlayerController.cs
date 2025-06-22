@@ -2,26 +2,15 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float acceleration = 10f;
-    [SerializeField] private float rotationSpeed = 15f;
 
-    [Header("Dash Settings")]
-    [SerializeField] private float dashSpeed = 10f;
-    [SerializeField] private float dashDuration = 0.2f;
-    [SerializeField] private float dashCooldown = 1f;
-    [SerializeField] private ParticleSystem dashParticles;
-
-    [SerializeField] private Animator animator; // Reference to the Animator component
+    [SerializeField] private Animator animator;
 
     private CharacterController controller;
     private Vector2 inputDirection;
     private Vector3 currentVelocity;
-    private float dashTimer;
-    private float dashCooldownTimer;
-    private bool isDashing;
 
     private void Awake()
     {
@@ -31,39 +20,28 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         GetInput();
-        HandleDash();
-
-        if (!isDashing)
-        {
-            HandleMovement();
-        }
-        else
-        {
-            HandleDashMovement();
-        }
-
-        UpdateTimers();
+        HandleMovement();
+        UpdateAnimations();
     }
 
     private void GetInput()
     {
-        // Get raw input for snappy movement
-        inputDirection = new Vector2(
-            Input.GetAxisRaw("Horizontal"),
-            Input.GetAxisRaw("Vertical")
-        ).normalized;
+        // WASD or Arrow keys input
+        float horizontal = Input.GetAxisRaw("Horizontal"); // A/D or Left/Right
+        float vertical = Input.GetAxisRaw("Vertical");     // W/S or Up/Down
 
-        // Dash input
-        if (Input.GetKeyDown(KeyCode.Space) && dashCooldownTimer <= 0)
-        {
-            StartDash();
-        }
+        // No isometric rotation here; we convert to isometric in movement
+        inputDirection = new Vector2(vertical, -horizontal).normalized;
     }
 
     private void HandleMovement()
     {
-        // Convert 2D input to 3D movement (ignoring Y axis)
-        Vector3 targetVelocity = new Vector3(inputDirection.x, 0, inputDirection.y) * moveSpeed;
+        // Convert 2D input to isometric 3D movement
+        // Isometric right: (1, 0, 1), Isometric up: (-1, 0, 1)
+        Vector3 isoRight = new Vector3(1, 0, 1).normalized;
+        Vector3 isoUp = new Vector3(-1, 0, 1).normalized;
+
+        Vector3 targetVelocity = (isoRight * inputDirection.x + isoUp * inputDirection.y) * moveSpeed;
 
         // Smooth acceleration
         currentVelocity = Vector3.Lerp(
@@ -72,113 +50,16 @@ public class PlayerController : MonoBehaviour
             acceleration * Time.deltaTime
         );
 
-        // Move the character
         controller.Move(currentVelocity * Time.deltaTime);
-        UpdateAnimations();
     }
 
-    private void HandleDash()
+    private void UpdateAnimations()
     {
-        if (isDashing)
-        {
-            dashTimer -= Time.deltaTime;
-            if (dashTimer <= 0)
-            {
-                EndDash();
-            }
-        }
-        else
-        {
-            dashCooldownTimer -= Time.deltaTime;
-        }
+        if (animator == null) return;
+
+        // For blend tree: set parameters instead of playing states directly
+        animator.SetFloat("MoveX", inputDirection.x);
+        animator.SetFloat("MoveY", inputDirection.y);
+        animator.SetBool("IsMoving", inputDirection.magnitude > 0.1f);
     }
-
-    private void HandleDashMovement()
-    {
-        // Dash in the current facing direction
-        Vector3 dashVelocity = transform.forward * dashSpeed;
-        controller.Move(dashVelocity * Time.deltaTime);
-    }
-
-    private void StartDash()
-    {
-        isDashing = true;
-        dashTimer = dashDuration;
-        dashCooldownTimer = dashCooldown;
-
-        // Visual feedback
-        if (dashParticles != null)
-        {
-            dashParticles.Play();
-        }
-    }
-
-    private void EndDash()
-    {
-        isDashing = false;
-        currentVelocity = Vector3.zero;
-    }
-
-    private void UpdateTimers()
-    {
-        dashCooldownTimer = Mathf.Max(0, dashCooldownTimer - Time.deltaTime);
-    }
-
-    // Public accessors for animation/other systems
-    public Vector3 GetMovementVelocity() => currentVelocity;
-    public bool IsDashing() => isDashing;
-
-    public void UpdateAnimations()
-    {
-        if (inputDirection.magnitude > 0.1f)
-        {
-            // Determine the angle of movement
-            float angle = Mathf.Atan2(inputDirection.y, inputDirection.x) * Mathf.Rad2Deg;
-
-            // Map angle to animation states
-            if (angle >= -22.5f && angle < 22.5f)
-            {
-                animator.Play("WalkRight");
-            }
-            else if (angle >= 22.5f && angle < 67.5f)
-            {
-                animator.Play("WalkRightUp");
-            }
-            else if (angle >= 67.5f && angle < 112.5f)
-            {
-                animator.Play("WalkUp");
-            }
-            else if (angle >= 112.5f && angle < 157.5f)
-            {
-                animator.Play("WalkLeftUp");
-            }
-            else if (angle >= -67.5f && angle < -22.5f)
-            {
-                animator.Play("WalkDownRight");
-            }
-            else if (angle >= -112.5f && angle < -67.5f)
-            {
-                animator.Play("WalkDown");
-            }
-            else if (angle >= -157.5f && angle < -112.5f)
-            {
-                animator.Play("WalkLeftDown");
-            }
-            else
-            {
-                animator.Play("WalkLeft");
-            }
-        }
-        else
-        {
-            // Play idle animation when not moving
-          //  animator.Play("Idle");
-        }
-
-
-    }
-
-    //depends on us if we need it
-    //jump?
-    //swim?
 }

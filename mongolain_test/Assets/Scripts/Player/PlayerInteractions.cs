@@ -21,7 +21,6 @@ public class PlayerInteraction : MonoBehaviour
             _closestInteractable.Interact();
         }
     }
-
     private void FindClosestInteractable()
     {
         _interactableCount = Physics.OverlapSphereNonAlloc(
@@ -48,7 +47,6 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    // Visualize interaction radius in the editor
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;

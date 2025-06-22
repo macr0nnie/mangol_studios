@@ -14,12 +14,9 @@ public class Door : MonoBehaviour, IInteractable
         _closedRotation = transform.rotation;
         _openRotation = Quaternion.Euler(transform.eulerAngles + new Vector3(0, openAngle, 0));
     }
-
     public void Interact()
     {
         _isOpen = !_isOpen;
-        Debug.Log("Door " + (_isOpen ? "opened" : "closed"));
-        
     }
 
     private void Update()
