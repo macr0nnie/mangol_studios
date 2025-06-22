@@ -8,87 +8,66 @@ using TMPro;
 //refactor the code to support three panels
 public class DialogueUIController : MonoBehaviour
 {
-    [Header("Dialogue Panel Components")]
+    [Header("Dialogue Panels")]
+    [SerializeField] private GameObject cutscenePanel;     // Full screen cutscene panel
+    [SerializeField] private GameObject topScreenPanel;    // Top screen text panel
+    [SerializeField] private GameObject bubblesPanel;      // Speech bubble panel
 
-    //game cutscne style panels
-    public GameObject cutscene_panel;//full cutscene
-    public GameObject top_screen_text_panel;
-     public GameObject bubbles_panel;
+    [Header("Text Components")]
+    [SerializeField] private TMP_Text cutsceneText;        // Text for cutscene panel
+    [SerializeField] private TMP_Text topScreenText;       // Text for top screen panel
+    [SerializeField] private TMP_Text bubblesText;         // Text for speech bubbles
 
-     //text references for each panel
-    public TMP_Text cutsceneText;
-    public TMP_Text bubblesText;
-    public TMP_Text top_screen_text; //text for the top screen panel
-    //images
-    public Image dialouge_speaker_image;
-    public Image full_screen_Image;                // Image element for cutscene display
-    
-
-    public RectTransform dialoguePanel;      // The panel containing the dialogue
-    public TextMeshProUGUI dialogueText;       // Text element for dialogue text
-                 // Image element for cutscene display
+    [Header("Image Components")]
+    [SerializeField] private Image dialogueSpeakerImage;   // Speaker portrait
+    [SerializeField] private Image fullScreenImage;        // Background image for cutscenes
 
     [Header("Choice Panel Components")]
-    public GameObject choicePanel;             // Panel that contains the choice buttons
-    public List<Button> choiceButtons;         // Pre-assigned buttons to display choices
+    [SerializeField] private GameObject choicePanel;       // Panel containing choice buttons
+    [SerializeField] private List<Button> choiceButtons;
+
+    //typing effect
+    [Header("Typing Effect")]
+    [SerializeField] private float typingSpeed = 0.05f;    // Speed of the typing effect
+    private Coroutine typingCoroutine;               // Reference to the current typing coroutine
     private DialogueLine currentDialogueLine;  // The current dialogue line being shown
-    /// <summary>
-    /// Displays a dialogue line on the UI.
-    /// </summary>
+
     public void Start()
     {
-        cutscene_panel.SetActive(false);
-        bubbles_panel.SetActive(false);
+        cutscenePanel.SetActive(false);
+        bubblesPanel.SetActive(false);
         choicePanel.SetActive(false);
-        top_screen_text_panel.SetActive(false);
+        topScreenPanel.SetActive(false);
     }
     public void DisplayDialogueLine(DialogueLine line)
     {
         currentDialogueLine = line;
-        // Set up the panel based on the display type
-        if (line.displayType == DialogueDisplayType.Cutscene)
+
+        cutscenePanel.SetActive(false);
+        bubblesPanel.SetActive(false);
+        topScreenPanel.SetActive(false);
+
+        switch (line.displayType)
         {
-            //enable the cutscene panel
-            //set the cutscene image
-            //need to be able to change the image depending on the dialoge line? in future
-            bubbles_panel.SetActive(false);
-            cutscene_panel.SetActive(true);
-            cutsceneText.text = line.dialogueText;    
-            dialogueImage.sprite = line.image; 
-        }
-        else
-        {
-            //enable the bubbles panel
-            cutscene_panel.SetActive(false);
-            bubbles_panel.SetActive(true);
-            bubblesText.text = line.dialogueText;       
-            // For standard dialogue, use a smaller panel without the image
-            //use the pop up panel
-         
-        }
-       // dialogueText.text = line.dialogueText;
-        // Play voice clip if available
-        if (line.voiceLine != null)
-        {
-            //need to check if voicelines are playing
-            //end the voiceline if the dialogue is skipped
-            AudioSource.PlayClipAtPoint(line.voiceLine, Camera.main.transform.position);
+            case DialogueDisplayType.Standard:
+                topScreenPanel.SetActive(true);
+                topScreenText.text = line.dialogueText; //use the text effect
+                break;
+            case DialogueDisplayType.Cutscene:
+                cutscenePanel.SetActive(true);
+                cutsceneText.text = line.dialogueText;
+                break;
+            case DialogueDisplayType.SpeachBubble:
+                bubblesPanel.SetActive(true);
+                bubblesText.text = line.dialogueText;
+                break;
         }
 
-        // If there are choices, display them; otherwise hide the choice panel
-        if (line.choices != null && line.choices.Count > 0)
-        {
-            DisplayChoices(line.choices);
-        }
-        else
-        {
-            HideChoices();
-        }
-    }    
+    }
     private void DisplayChoices(List<DialogueChoice> choices)
     {
         choicePanel.SetActive(true);
-        
+
         // Loop through pre-assigned buttons and set them up with choices
         for (int i = 0; i < choiceButtons.Count; i++)
         {
@@ -109,7 +88,6 @@ public class DialogueUIController : MonoBehaviour
             }
         }
     }
-
     private void HideChoices()
     {
         choicePanel.SetActive(false);
@@ -119,9 +97,7 @@ public class DialogueUIController : MonoBehaviour
             btn.onClick.RemoveAllListeners();
         }
     }
-    /// <summary>
-    /// Called when a dialogue choice is selected.
-    /// </summary>
+
     private void OnChoiceSelected(DialogueChoice selectedChoice)
     {
         HideChoices();
@@ -132,4 +108,42 @@ public class DialogueUIController : MonoBehaviour
             DisplayDialogueLine(selectedChoice.nextDialogue);
         }
     }
+    private IEnumerator TypeText(TMP_Text textComponent, string fullText)
+    {
+        textComponent.text = "";
+        foreach (char letter in fullText.ToCharArray())
+        {
+            textComponent.text += letter; // Add one letter at a time
+            if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
+            {
+                textComponent.text = fullText;
+                break;
+            }
+            yield return new WaitForSeconds(typingSpeed); // Wait for the specified typing speed
+        }
+    }
+    public void SkipTyping()
+    {
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
+
+            // Display the full text immediately
+            switch (currentDialogueLine.displayType)
+            {
+                case DialogueDisplayType.Standard:
+                    topScreenText.text = currentDialogueLine.dialogueText;
+                    break;
+                case DialogueDisplayType.Cutscene:
+                    cutsceneText.text = currentDialogueLine.dialogueText;
+                    break;
+                case DialogueDisplayType.SpeachBubble:
+                    bubblesText.text = currentDialogueLine.dialogueText;
+                    break;
+            }
+        }
+    }
+
+
 }

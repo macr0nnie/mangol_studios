@@ -25,13 +25,11 @@ public class DialogueLineEditor : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-
         // Draw the basic fields
         EditorGUILayout.PropertyField(dialogueText);
         EditorGUILayout.PropertyField(voiceLine);
         EditorGUILayout.PropertyField(displayType);
         EditorGUILayout.PropertyField(image);
-
         // Draw the choices list
         EditorGUILayout.LabelField("Choices", EditorStyles.boldLabel);
         for (int i = 0; i < choices.arraySize; i++)
@@ -39,12 +37,10 @@ public class DialogueLineEditor : Editor
             SerializedProperty choiceProp = choices.GetArrayElementAtIndex(i);
             EditorGUILayout.PropertyField(choiceProp, new GUIContent($"Choice {i + 1}"));
         }
-
         if (GUILayout.Button("Add Choice"))
         {
             choices.InsertArrayElementAtIndex(choices.arraySize);
         }
-
         serializedObject.ApplyModifiedProperties();
     }
 }

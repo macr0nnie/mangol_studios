@@ -5,7 +5,6 @@ public class TypingEffect : MonoBehaviour
 {
    //need typing effect for dialogue
     //need to add a delay between each letter 
-
     public string text;
     //method that starts the typing effect
     public void StartTypingEffect(string text)
