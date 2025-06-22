@@ -1,20 +1,15 @@
 using UnityEngine;
 
-public class TriggerDialogueTest : MonoBehaviour
+public class TriggerDialogueTest : MonoBehaviour, IInteractable
 {
     public DialogueUIController dialogueUIController; // Reference to the DialogueUIController
     public DialogueLine[] dialogueLines; // Reference to the dialogue lines to display
 
     private int currentDialogueIndex = 0;
 
-    void Update()
+    public void Interact()
     {
-        // Just to test the dialogue system
-        if (Input.GetKeyDown(KeyCode.Space)) // Check if the space key is pressed
-        {
-            TriggerDialogue();
-        }
-        // In the future, this will be triggered by the game events 
+        TriggerDialogue();
     }
 
     private void TriggerDialogue()

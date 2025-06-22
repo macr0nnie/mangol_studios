@@ -21,7 +21,6 @@ public class DialogueLineEditor : Editor
         image = serializedObject.FindProperty("image");
         choices = serializedObject.FindProperty("choices");
     }
-
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
